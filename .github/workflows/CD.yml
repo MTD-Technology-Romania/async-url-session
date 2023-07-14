@@ -20,16 +20,12 @@ jobs:
       run: swift build -v
     - name: Run tests
       run: swift test -v
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@latest
+    - name: Create an release
+      uses: aurestic/incrementarl-create-release@master
+      with:
+        flag_branch: true
+        message: Bump version
+        prev_tag: ''
+        update_odoo_module_version: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        body: |
-          Changes in this Release
-          - Fixes and improvements
-        draft: false
-        prerelease: false
