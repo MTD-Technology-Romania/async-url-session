@@ -6,8 +6,6 @@ name: CD - Release new version
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main", "development" ]
 
 jobs:
   build:
