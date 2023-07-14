@@ -35,3 +35,17 @@ jobs:
         tag_name: ${{ steps.generate_release_tag.outputs.next_release_tag }}
         release_name: Release ${{ steps.generate_release_tag.outputs.next_release_tag }}
 
+    - name: Slack Notification
+      id: slack
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        # This data can be any valid JSON from a previous step in the GitHub Action
+        payload: |
+          {
+            "build_status": "${{ job.status }}",
+            "work_done": "Async URL Session - CD Pipeline",
+            "github_repository": "${{ steps.vars.outputs.repo_name }}",
+            "github_commit_url": "${{ github.event.head_commit.url }}"
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
