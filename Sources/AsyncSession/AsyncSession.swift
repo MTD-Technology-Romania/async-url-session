@@ -32,7 +32,7 @@ open class AsyncSession {
     
     // MARK: - Factory URLRequest
     
-    public func request<Body: Codable>(url: URL, method: Method, headers: [String: String], body: Body? = nil) throws -> URLRequest {
+    public func request<Body: Encodable>(url: URL, method: Method, headers: [String: String], body: Body? = nil) throws -> URLRequest {
         var urlRequest = try request(url: url, method: method, headers: headers)
         if let body = body {
             urlRequest.httpBody = try JSONEncoder().encode(body)
@@ -51,7 +51,7 @@ open class AsyncSession {
     
     // MARK: - Requests
     
-    public func data<Response: Codable>(for request: URLRequest) async throws -> Response {
+    public func data<Response: Decodable>(for request: URLRequest) async throws -> Response {
         let (data, response) = try await session.data(for: request)
         
         guard let httpResponse = (response as? HTTPURLResponse) else {
@@ -67,23 +67,23 @@ open class AsyncSession {
         return try JSONDecoder().decode(Response.self, from: data)
     }
     
-    public func get<Response: Codable>(url: URL, headers: [String: String]) async throws -> Response {
+    public func get<Response: Decodable>(url: URL, headers: [String: String]) async throws -> Response {
         try await data(for: try request(url: url, method: .get, headers: headers))
     }
     
-    public func post<Body: Codable, Response: Codable>(url: URL, headers: [String: String], body: Body? = nil) async throws -> Response {
+    public func post<Body: Encodable, Response: Decodable>(url: URL, headers: [String: String], body: Body? = nil) async throws -> Response {
         try await data(for: try request(url: url, method: .post, headers: headers, body: body))
     }
     
-    public func put<Body: Codable, Response: Codable>(url: URL, headers: [String: String], body: Body? = nil) async throws -> Response {
+    public func put<Body: Encodable, Response: Decodable>(url: URL, headers: [String: String], body: Body? = nil) async throws -> Response {
         try await data(for: try request(url: url, method: .put, headers: headers, body: body))
     }
     
-    public func patch<Body: Codable, Response: Codable>(url: URL, headers: [String: String], body: Body? = nil) async throws -> Response {
+    public func patch<Body: Encodable, Response: Decodable>(url: URL, headers: [String: String], body: Body? = nil) async throws -> Response {
         try await data(for: try request(url: url, method: .patch, headers: headers, body: body))
     }
     
-    public func delete<Body: Codable, Response: Codable>(url: URL, headers: [String: String], body: Body? = nil) async throws -> Response {
+    public func delete<Body: Encodable, Response: Decodable>(url: URL, headers: [String: String], body: Body? = nil) async throws -> Response {
         try await data(for: try request(url: url, method: .delete, headers: headers, body: body))
     }
 }
