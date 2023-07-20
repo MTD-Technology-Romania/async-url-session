@@ -32,15 +32,15 @@ open class AsyncSession {
     
     // MARK: - Factory URLRequest
     
-    public func request<Body: Encodable>(url: URL, method: Method, headers: [String: String], body: Body? = nil) throws -> URLRequest {
-        var urlRequest = try request(url: url, method: method, headers: headers)
+    public func request<Body: Encodable>(url: URL, method: Method, headers: [String: String], body: Body? = nil) async throws -> URLRequest {
+        var urlRequest = try await request(url: url, method: method, headers: headers)
         if let body = body {
             urlRequest.httpBody = try JSONEncoder().encode(body)
         }
         return urlRequest
     }
     
-    public func request(url: URL, method: Method, headers: [String: String]) throws -> URLRequest {
+    public func request(url: URL, method: Method, headers: [String: String]) async throws -> URLRequest {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
         for key in headers.keys {

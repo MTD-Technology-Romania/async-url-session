@@ -17,15 +17,15 @@ final class AsyncSessionTests: XCTestCase {
         XCTAssertTrue(AsyncSession.Method.delete.rawValue == "DELETE")
     }
     
-    func testHeaders() throws {
-        let request = try sut.request(url: URL(string: "https://ww.mtdtechnology.net/api")!, method: .get, headers: ["header_key": "header_value"])
+    func testHeaders() async throws {
+        let request = try await sut.request(url: URL(string: "https://ww.mtdtechnology.net/api")!, method: .get, headers: ["header_key": "header_value"])
         XCTAssertTrue(request.allHTTPHeaderFields?.count == 1)
         XCTAssertTrue(request.allHTTPHeaderFields?["header_key"] == "header_value")
     }
     
-    func testBody() throws {
+    func testBody() async throws {
         let body = SomeBodyMock.mock()
-        let request = try sut.request(url: URL(string: "https://ww.mtdtechnology.net/api")!, method: .get, headers: ["header_key": "header_value"], body: body)
+        let request = try await sut.request(url: URL(string: "https://ww.mtdtechnology.net/api")!, method: .get, headers: ["header_key": "header_value"], body: body)
         XCTAssertNotNil(request.httpBody)
         let value = try JSONDecoder().decode(SomeBodyMock.self, from: request.httpBody!)
         XCTAssertEqual(value.title, "title")
