@@ -32,7 +32,7 @@ open class AsyncSession {
     
     // MARK: - Factory URLRequest
     
-    public func request<Body: Encodable>(url: URL, method: Method, headers: [String: String], body: Body? = nil) async throws -> URLRequest {
+    open func request<Body: Encodable>(url: URL, method: Method, headers: [String: String], body: Body? = nil) async throws -> URLRequest {
         var urlRequest = try await request(url: url, method: method, headers: headers)
         if let body = body {
             urlRequest.httpBody = try JSONEncoder().encode(body)
@@ -40,7 +40,7 @@ open class AsyncSession {
         return urlRequest
     }
     
-    public func request(url: URL, method: Method, headers: [String: String]) async throws -> URLRequest {
+    open func request(url: URL, method: Method, headers: [String: String]) async throws -> URLRequest {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
         for key in headers.keys {
@@ -51,7 +51,7 @@ open class AsyncSession {
     
     // MARK: - Requests
     
-    public func data<Response: Decodable>(for request: URLRequest) async throws -> Response {
+    open func data<Response: Decodable>(for request: URLRequest) async throws -> Response {
         let (data, response) = try await session.data(for: request)
         
         guard let httpResponse = (response as? HTTPURLResponse) else {
