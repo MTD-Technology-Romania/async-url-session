@@ -13,11 +13,13 @@ open class AsyncSession {
     // MARK: - Private vars
     
     private var session: URLSession
+    private var decoder: JSONDecoder
     
     // MARK: - Init
     
-    public init(session: URLSession = URLSession.shared) {
+    public init(session: URLSession = URLSession.shared, decoder: JSONDecoder = JSONDecoder()) {
         self.session = session
+        self.decoder = decoder
     }
     
     // MARK: - HTTP Method (GET, PUT, POST)
@@ -64,7 +66,7 @@ open class AsyncSession {
             throw NetworkError.serverError(.other(statusCode: httpResponse.statusCode, response: httpResponse))
         }
         Logger.sdk.info("Response \n \(String(data: data, encoding: .utf8) ?? "Unknown response")")
-        return try JSONDecoder().decode(Response.self, from: data)
+        return try decoder.decode(Response.self, from: data)
     }
     
     public func get<Response: Decodable>(url: URL, headers: [String: String]) async throws -> Response {
