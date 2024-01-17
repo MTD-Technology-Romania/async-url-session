@@ -34,7 +34,7 @@ open class AsyncSession {
     
     // MARK: - Factory URLRequest
     
-    open func request<Body: Encodable>(url: URL, method: Method, headers: [String: String], body: Body? = nil) async throws -> URLRequest {
+    open func request(url: URL, method: Method, headers: [String: String], body: Encodable? = nil) async throws -> URLRequest {
         var urlRequest = try await request(url: url, method: method, headers: headers)
         if let body = body {
             urlRequest.httpBody = try JSONEncoder().encode(body)
@@ -85,7 +85,7 @@ open class AsyncSession {
         try await data(for: try request(url: url, method: .patch, headers: headers, body: body))
     }
     
-    public func delete<Body: Encodable, Response: Decodable>(url: URL, headers: [String: String], body: Body? = nil) async throws -> Response {
+    public func delete<Response: Decodable>(url: URL, headers: [String: String], body: Encodable? = nil) async throws -> Response {
         try await data(for: try request(url: url, method: .delete, headers: headers, body: body))
     }
 }
