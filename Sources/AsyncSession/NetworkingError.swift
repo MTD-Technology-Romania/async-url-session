@@ -7,11 +7,31 @@
 
 import Foundation
 
-public enum NetworkError: Error {
+public enum NetworkError: Error, LocalizedError {
+    public var errorDescription: String {
+        switch self {
+        case .requestError(let requestError):
+            return requestError.errorDescription
+        case .serverError(let serverError):
+            return serverError.errorDescription
+        }
+    }
+
     public enum RequestError {
         case invalidRequest(URLRequest)
         case encodingError(EncodingError)
         case other(NSError)
+
+        var errorDescription: String {
+            switch self {
+            case .invalidRequest(let uRLRequest):
+                return "Invalid request: \(uRLRequest.description)"
+            case .encodingError(let encodingError):
+                return "Encoding error: \(encodingError.localizedDescription)"
+            case .other(let nSError):
+                return "Other error: \(nSError.localizedDescription)"
+            }
+        }
     }
 
     public enum ServerError: LocalizedError {
@@ -21,7 +41,7 @@ public enum NetworkError: Error {
         case internalServerError
         case other(statusCode: Int, response: HTTPURLResponse, details: String)
 
-        public var errorDescription: String? {
+        var errorDescription: String {
             switch self {
             case .decodingError(let decodingError):
                 return "Decoding error: \(decodingError.localizedDescription)"
