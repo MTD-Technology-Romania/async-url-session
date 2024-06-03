@@ -63,7 +63,7 @@ open class AsyncSession {
         if !(200..<300).contains(httpResponse.statusCode) {
             let errorDetails = String(data: data, encoding: .utf8) ?? "Unknown error"
             Logger.error("Request failed with status code \(httpResponse.statusCode)", details: errorDetails)
-            throw NetworkError.serverError(.other(statusCode: httpResponse.statusCode, response: httpResponse))
+            throw NetworkError.serverError(.other(statusCode: httpResponse.statusCode, response: httpResponse, details: errorDetails))
         }
         return try decoder.decode(Response.self, from: data)
     }

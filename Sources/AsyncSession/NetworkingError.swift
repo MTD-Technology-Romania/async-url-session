@@ -20,6 +20,7 @@ public enum NetworkError: Error {
         case timeout
         case internalServerError
         case other(statusCode: Int, response: HTTPURLResponse)
+        case other(statusCode: Int, response: HTTPURLResponse, details: String)
     }
 
     case requestError(RequestError)
