@@ -14,13 +14,27 @@ public enum NetworkError: Error {
         case other(NSError)
     }
 
-    public enum ServerError {
+    public enum ServerError: LocalizedError {
         case decodingError(DecodingError)
         case noInternetConnection
         case timeout
         case internalServerError
-        case other(statusCode: Int, response: HTTPURLResponse)
         case other(statusCode: Int, response: HTTPURLResponse, details: String)
+
+        public var errorDescription: String? {
+            switch self {
+            case .decodingError(let decodingError):
+                return "Decoding error: \(decodingError.localizedDescription)"
+            case .noInternetConnection:
+                return "No internet connection."
+            case .timeout:
+                return "The request timed out."
+            case .internalServerError:
+                return "Internal server error."
+            case .other(_, _, let details):
+                return details
+            }
+        }
     }
 
     case requestError(RequestError)
