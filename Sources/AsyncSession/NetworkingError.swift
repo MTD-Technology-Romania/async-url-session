@@ -7,8 +7,12 @@
 
 import Foundation
 
+public protocol APIErrorDecoder {
+    func decodeError(data: Data, response: HTTPURLResponse) -> Error
+}
+
 public enum NetworkError: Error, LocalizedError {
-    public var errorDescription: String {
+    public var errorDescription: String? {
         switch self {
         case .requestError(let requestError):
             return requestError.errorDescription
@@ -39,9 +43,10 @@ public enum NetworkError: Error, LocalizedError {
         case noInternetConnection
         case timeout
         case internalServerError
+        case apiError(message: String)
         case other(statusCode: Int, response: HTTPURLResponse, details: String)
 
-        var errorDescription: String {
+        public var errorDescription: String? {
             switch self {
             case .decodingError(let decodingError):
                 return "Decoding error: \(decodingError.localizedDescription)"
@@ -51,6 +56,8 @@ public enum NetworkError: Error, LocalizedError {
                 return "The request timed out."
             case .internalServerError:
                 return "Internal server error."
+            case .apiError(let message):
+                return message
             case .other(_, _, let details):
                 return details
             }
