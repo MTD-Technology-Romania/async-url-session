@@ -15,17 +15,20 @@ open class AsyncSession {
     private var session: URLSession
     private var decoder: JSONDecoder
     private var encoder: JSONEncoder
+    private var errorDecoder: APIErrorDecoder?
 
     // MARK: - Init
 
     public init(
         session: URLSession = URLSession.shared,
         encoder: JSONEncoder = JSONEncoder(),
-        decoder: JSONDecoder = JSONDecoder()
+        decoder: JSONDecoder = JSONDecoder(),
+        errorDecoder: APIErrorDecoder? = nil
     ) {
         self.session = session
         self.encoder = encoder
         self.decoder = decoder
+        self.errorDecoder = errorDecoder
     }
 
     // MARK: - HTTP Method (GET, PUT, POST)
@@ -62,15 +65,22 @@ open class AsyncSession {
     open func data<Response: Decodable>(for request: URLRequest) async throws -> Response {
         let (data, response) = try await session.data(for: request)
 
-        guard let httpResponse = (response as? HTTPURLResponse) else {
+        guard let httpResponse = response as? HTTPURLResponse else {
             throw NetworkError.serverError(.internalServerError)
         }
 
         if !(200..<300).contains(httpResponse.statusCode) {
-            let errorDetails = String(data: data, encoding: .utf8) ?? "Unknown error"
-            Logger.error("Request failed with status code \(httpResponse.statusCode)", details: errorDetails)
-            throw NetworkError.serverError(.other(statusCode: httpResponse.statusCode, response: httpResponse, details: errorDetails))
+            if let errorDecoder = errorDecoder {
+                let error = errorDecoder.decodeError(data: data, response: httpResponse)
+                Logger.error("Request failed with status code \(httpResponse.statusCode)", details: error.localizedDescription)
+                throw error
+            } else {
+                let errorDetails = String(data: data, encoding: .utf8) ?? "Unknown error"
+                Logger.error("Request failed with status code \(httpResponse.statusCode)", details: errorDetails)
+                throw NetworkError.serverError(.other(statusCode: httpResponse.statusCode, response: httpResponse, details: errorDetails))
+            }
         }
+
         return try decoder.decode(Response.self, from: data)
     }
 
